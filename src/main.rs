@@ -197,13 +197,22 @@ fn cmd_exec(args: &[String]) -> i32 {
 
     for ns in &namespaces {
         match keychain::search_values(ns) {
+            Ok(pairs) if pairs.is_empty() => {
+                eprintln!(
+                    "WARNING: namespace `{ns}` not defined.\n         \
+                     You can set via running `keyser --set {ns} SOME_ENV_NAME`.\n"
+                );
+            }
             Ok(pairs) => {
                 for (key, value) in pairs {
                     std::env::set_var(&key, &value);
                 }
             }
             Err(keychain::KeyserError::ItemNotFound) => {
-                eprintln!("keyser: warning: namespace '{}' not found, skipping", ns);
+                eprintln!(
+                    "WARNING: namespace `{ns}` not defined.\n         \
+                     You can set via running `keyser --set {ns} SOME_ENV_NAME`.\n"
+                );
             }
             Err(e) => {
                 eprintln!("keyser: failed to load namespace '{}': {}", ns, e);
