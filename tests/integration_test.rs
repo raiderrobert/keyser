@@ -3,10 +3,7 @@
 use std::io::Write;
 use std::process::{Command, Stdio};
 
-/// Path to the compiled binary. `cargo test` builds it at this location.
 fn keyser_bin() -> String {
-    // Use the CARGO_BIN_EXE_keyser env var if available (set by cargo test),
-    // otherwise fall back to cargo build and locate the binary.
     env!("CARGO_BIN_EXE_keyser").to_string()
 }
 

@@ -93,7 +93,6 @@ fn cmd_set(args: &[String]) -> i32 {
                 line.trim_end_matches('\n').to_string()
             }
         } else {
-            // Piped stdin: read one line per key
             let mut line = String::new();
             if let Err(e) = reader.read_line(&mut line) {
                 eprintln!("Failed to read value for {key}: {e}");
@@ -111,7 +110,7 @@ fn cmd_set(args: &[String]) -> i32 {
     0
 }
 
-/// --list / -l: list namespaces or keys in a namespace
+/// --list / -l: list namespaces or keys within a namespace
 fn cmd_list(args: &[String]) -> i32 {
     let mut show_value = false;
     let mut namespace = None;
@@ -124,40 +123,34 @@ fn cmd_list(args: &[String]) -> i32 {
     }
 
     match namespace {
-        None => {
-            // List all namespaces
-            match keychain::search_namespaces() {
-                Ok(ns) => {
-                    for n in ns {
-                        println!("{n}");
-                    }
-                    0
+        None => match keychain::search_namespaces() {
+            Ok(ns) => {
+                for n in ns {
+                    println!("{n}");
                 }
-                Err(e) => {
-                    eprintln!("Failed to list namespaces: {e}");
-                    1
-                }
+                0
             }
-        }
-        Some(ns) => {
-            // List keys in namespace
-            match keychain::search_values(ns) {
-                Ok(pairs) => {
-                    for (key, value) in pairs {
-                        if show_value {
-                            println!("{key}={value}");
-                        } else {
-                            println!("{key}");
-                        }
-                    }
-                    0
-                }
-                Err(e) => {
-                    eprintln!("Failed to list keys: {e}");
-                    1
-                }
+            Err(e) => {
+                eprintln!("Failed to list namespaces: {e}");
+                1
             }
-        }
+        },
+        Some(ns) => match keychain::search_values(ns) {
+            Ok(pairs) => {
+                for (key, value) in pairs {
+                    if show_value {
+                        println!("{key}={value}");
+                    } else {
+                        println!("{key}");
+                    }
+                }
+                0
+            }
+            Err(e) => {
+                eprintln!("Failed to list keys: {e}");
+                1
+            }
+        },
     }
 }
 
@@ -181,7 +174,6 @@ fn cmd_unset(args: &[String]) -> i32 {
     0
 }
 
-/// Exec mode: load env vars from namespace(s) and exec a command
 fn cmd_exec(args: &[String]) -> i32 {
     if args.len() < 2 {
         eprintln!("Usage: keyser NAMESPACE CMD [ARG ..]");
@@ -192,7 +184,6 @@ fn cmd_exec(args: &[String]) -> i32 {
     let cmd = &args[1];
     let cmd_args = &args[2..];
 
-    // Split namespace by commas
     let namespaces: Vec<&str> = namespaces_arg.split(',').collect();
 
     for ns in &namespaces {
