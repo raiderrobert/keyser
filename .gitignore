@@ -1,0 +1,17 @@
+# Rust
+/target
+*.profraw
+*.profdata
+
+# Tooling
+.worktrees/
+.beads/
+.claude/
+CLAUDE.md
+
+# macOS
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/

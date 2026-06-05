@@ -1,0 +1,18 @@
+[package]
+name = "keyser"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+rust-version = "1.75"
+description = "Environment variables meet macOS Keychain — a modern envchain port"
+repository = "https://github.com/raiderrobert/keyser"
+
+[[bin]]
+name = "keyser"
+path = "src/main.rs"
+
+[dependencies]
+security-framework = "3.7"
+security-framework-sys = "2.17"
+core-foundation = "0.10"
+rpassword = "7.5"
