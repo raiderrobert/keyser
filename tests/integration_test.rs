@@ -1,7 +1,7 @@
 #![cfg(feature = "keychain-tests")]
 
-use std::process::{Command, Stdio};
 use std::io::Write;
+use std::process::{Command, Stdio};
 
 /// Path to the compiled binary. `cargo test` builds it at this location.
 fn keyser_bin() -> String {
@@ -198,8 +198,14 @@ fn test_list_namespaces() {
     );
 
     // Check no duplicates
-    let count = stdout.lines().filter(|l| l.trim() == TEST_NAMESPACE).count();
-    assert_eq!(count, 1, "Namespace should appear exactly once, got {count}");
+    let count = stdout
+        .lines()
+        .filter(|l| l.trim() == TEST_NAMESPACE)
+        .count();
+    assert_eq!(
+        count, 1,
+        "Namespace should appear exactly once, got {count}"
+    );
 
     cleanup();
 }
@@ -245,7 +251,10 @@ fn test_exec_missing_namespace_warns() {
     );
     // Command should still execute
     let stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(stdout.contains("hello"), "command should still run, got stdout: {stdout}");
+    assert!(
+        stdout.contains("hello"),
+        "command should still run, got stdout: {stdout}"
+    );
 }
 
 #[test]
@@ -263,8 +272,14 @@ fn test_update_existing_value() {
         .output()
         .expect("failed to list");
     let stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(stdout.contains("UPDATE_ME=updated"), "expected updated value, got: {stdout}");
-    assert!(!stdout.contains("original"), "original value should be gone, got: {stdout}");
+    assert!(
+        stdout.contains("UPDATE_ME=updated"),
+        "expected updated value, got: {stdout}"
+    );
+    assert!(
+        !stdout.contains("original"),
+        "original value should be gone, got: {stdout}"
+    );
 
     cleanup();
 }
@@ -276,7 +291,10 @@ fn test_no_args_shows_help() {
         .expect("failed to run keyser");
     assert!(!output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("Usage"), "expected help output, got: {stderr}");
+    assert!(
+        stderr.contains("Usage"),
+        "expected help output, got: {stderr}"
+    );
 }
 
 #[test]
@@ -285,5 +303,8 @@ fn test_unset_nonexistent_is_ok() {
         .args(["--unset", "nonexistent-ns-xyzzy", "NOPE"])
         .status()
         .expect("failed to run keyser --unset");
-    assert!(status.success(), "unset of nonexistent item should succeed silently");
+    assert!(
+        status.success(),
+        "unset of nonexistent item should succeed silently"
+    );
 }

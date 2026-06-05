@@ -8,8 +8,8 @@ use security_framework::item::{
 };
 use security_framework_sys::base::errSecItemNotFound;
 use security_framework_sys::item::{
-    kSecAttrAccount, kSecAttrDescription, kSecAttrLabel, kSecAttrService,
-    kSecAttrSynchronizable, kSecClass, kSecClassGenericPassword, kSecValueData,
+    kSecAttrAccount, kSecAttrDescription, kSecAttrLabel, kSecAttrService, kSecAttrSynchronizable,
+    kSecClass, kSecClassGenericPassword, kSecValueData,
 };
 use security_framework_sys::keychain_item::SecItemAdd;
 use std::collections::BTreeSet;
@@ -90,18 +90,9 @@ pub fn save_value(
     unsafe {
         let mut dict = CFMutableDictionary::from_CFType_pairs(&[]);
         dict.add(&kSecClass.to_void(), &kSecClassGenericPassword.to_void());
-        dict.add(
-            &kSecAttrService.to_void(),
-            &CFString::new(&svc).to_void(),
-        );
-        dict.add(
-            &kSecAttrAccount.to_void(),
-            &CFString::new(key).to_void(),
-        );
-        dict.add(
-            &kSecAttrLabel.to_void(),
-            &CFString::new(&lbl).to_void(),
-        );
+        dict.add(&kSecAttrService.to_void(), &CFString::new(&svc).to_void());
+        dict.add(&kSecAttrAccount.to_void(), &CFString::new(key).to_void());
+        dict.add(&kSecAttrLabel.to_void(), &CFString::new(&lbl).to_void());
         dict.add(
             &kSecAttrDescription.to_void(),
             &CFString::new(ITEM_DESCRIPTION).to_void(),
@@ -112,7 +103,10 @@ pub fn save_value(
             &CFBoolean::false_value().to_void(),
         );
 
-        let status = SecItemAdd(dict.to_immutable().as_concrete_TypeRef(), std::ptr::null_mut());
+        let status = SecItemAdd(
+            dict.to_immutable().as_concrete_TypeRef(),
+            std::ptr::null_mut(),
+        );
         if status != 0 {
             return Err(security_framework::base::Error::from_code(status).into());
         }
