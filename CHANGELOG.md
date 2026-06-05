@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.2](https://github.com/raiderrobert/keyser/compare/v0.1.1...v0.1.2) (2026-06-05)
+
+
+### Miscellaneous
+
+* remove superpowers docs ([dc44fcc](https://github.com/raiderrobert/keyser/commit/dc44fcc3ed5cf184a20b9d8a330b2b49e89edf18))
+
+
+### Code Refactoring
+
+* clean up misleading comment on keyser_bin helper ([b1e6de5](https://github.com/raiderrobert/keyser/commit/b1e6de5fa05121402fd0914dadcf710cc4dc1093))
+
 ## [0.1.1](https://github.com/raiderrobert/keyser/compare/v0.1.0...v0.1.1) (2026-06-05)
 
 
