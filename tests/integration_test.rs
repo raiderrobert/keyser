@@ -231,3 +231,59 @@ fn test_exec_multiple_namespaces() {
 
     cleanup();
 }
+
+#[test]
+fn test_exec_missing_namespace_warns() {
+    let output = Command::new(keyser_bin())
+        .args(["nonexistent-ns-xyzzy", "echo", "hello"])
+        .output()
+        .expect("failed to run keyser exec");
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        stderr.contains("warning") || stderr.contains("WARNING") || stderr.contains("not found"),
+        "expected warning about missing namespace, got stderr: {stderr}"
+    );
+    // Command should still execute
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("hello"), "command should still run, got stdout: {stdout}");
+}
+
+#[test]
+fn test_update_existing_value() {
+    cleanup();
+
+    set_value(TEST_NAMESPACE, "UPDATE_ME", "original");
+
+    // Update to new value
+    set_value(TEST_NAMESPACE, "UPDATE_ME", "updated");
+
+    // Verify new value
+    let output = Command::new(keyser_bin())
+        .args(["--list", TEST_NAMESPACE, "-v"])
+        .output()
+        .expect("failed to list");
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    assert!(stdout.contains("UPDATE_ME=updated"), "expected updated value, got: {stdout}");
+    assert!(!stdout.contains("original"), "original value should be gone, got: {stdout}");
+
+    cleanup();
+}
+
+#[test]
+fn test_no_args_shows_help() {
+    let output = Command::new(keyser_bin())
+        .output()
+        .expect("failed to run keyser");
+    assert!(!output.status.success());
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("Usage"), "expected help output, got: {stderr}");
+}
+
+#[test]
+fn test_unset_nonexistent_is_ok() {
+    let status = Command::new(keyser_bin())
+        .args(["--unset", "nonexistent-ns-xyzzy", "NOPE"])
+        .status()
+        .expect("failed to run keyser --unset");
+    assert!(status.success(), "unset of nonexistent item should succeed silently");
+}
